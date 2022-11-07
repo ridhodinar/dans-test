@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -17,7 +18,7 @@ func GenerateJWT(username string) (string, error) {
 	claims["user"] = username
 	claims["exp"] = time.Now().Add(time.Minute * 300).Unix()
 
-	tokenString, err := token.SignedString([]byte("some_secret_key_val_123123"))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		fmt.Println(err)
 		return "", err
@@ -32,7 +33,7 @@ func ValidateHeader(bearerHeader string) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("error decoding token")
 		}
-		return []byte("some_secret_key_val_123123"), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
 		return nil, err
