@@ -1,0 +1,156 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: dans
+schemes: [http]
+host: dans.com
+basePath: /v1
+consumes: [application/json]
+produces: [application/json]
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths:
+  /login:
+    post:
+      description: 'Returns token for authorized User'
+      tags: [user]
+      operationId: Login
+      consumes:
+        - "application/json"
+      parameters:
+        - name: 'login'
+          in: 'body'
+          required: true
+          description: 'Login Payload'
+          schema:
+            $ref: '#/definitions/LoginInfo'
+      responses:
+        200:
+          description: Successful login
+          schema:
+            $ref: '#/definitions/LoginSuccess'
+        400:
+          description: Bad Request
+        404:
+          schema:
+            type: string
+          description: User not found
+        500:
+          schema:
+            type: string
+          description: Server error
+  /job:
+    get:
+      description: 'Get All job'
+      tags: [job]
+      operationId: GetAllJobs
+      # note the "security" tag created on the restricted endpoint
+      security:
+        - Bearer: []
+      parameters:
+        - name: description
+          in: query
+          type: string
+        - in: query
+          name: location
+          required: false
+          type: string
+        - in: query
+          name: full_time
+          required: false
+          type: string
+        - in: query
+          name: page
+          required: false
+          type: string
+      responses:
+        200:
+          description: "All Jobs"
+          schema:
+            $ref: '#/definitions/JobList'
+        400:
+          description: Bad Request
+        404:
+          description: Jobs Not Found
+        500:
+          schema:
+            type: string
+          description: Server error
+  /job/{id}:
+    get:
+      description: 'Get job details'
+      tags: [job]
+      operationId: GetJobDetail
+      # note the "security" tag created on the restricted endpoint
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+      responses:
+        200:
+          description: "Job Detail"
+          schema:
+            $ref: '#/definitions/JobDetail'
+        400:
+          description: Bad Request
+        404:
+          description: Jobs Not Found
+        500:
+          schema:
+            type: string
+          description: Server error
+
+
+definitions:
+  LoginInfo:
+    type: object
+    required: [username,password]
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+  LoginSuccess:
+    type: object
+    properties:
+      success:
+        type: boolean
+      token:
+        type: string
+  JobDetail:
+    type: object
+    properties:
+      company:
+        type: string
+      company_logo:
+        type: string
+      company_url:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      how_to_apply:
+        type: string
+      id:
+        type: string
+      location:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      url:
+        type: string
+  JobList:
+    type: array
+    items:
+      $ref: '#/definitions/JobDetail'
